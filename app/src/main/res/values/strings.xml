@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Earnly</string>
+    
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Share with anyone</string>
+    <string name="onboarding_desc_1">Get access to comprehensive guides on earning opportunities</string>
+    <string name="onboarding_title_2">Access everywhere</string>
+    <string name="onboarding_desc_2">Reach your guides from any device, anytime and anywhere</string>
+    <string name="onboarding_title_3">Save everything</string>
+    <string name="onboarding_desc_3">Keep all your favorite earning guides in one place</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Get Started</string>
+    
+    <!-- Main Screen -->
+    <string name="tab_money_ways">Одни способы заработка</string>
+    <string name="tab_other_ways">Другие способы заработка</string>
+    <string name="error_loading_content">Error loading content</string>
+    <string name="try_again">Try Again</string>
+    <string name="ad_label">Реклама</string>
+    
+    <!-- Article Screen -->
+    <string name="article_details">Article Details</string>
+    <string name="read_more">Read More</string>
+
+    <!-- Error Screen -->
+    <string name="error_no_internet">Ошибка получения данных с сервера. Проверьте интернет-соединение и повторите попытку.</string>
+    <string name="retry">ПОВТОРИТЬ ПОПЫТКУ</string>
+
+    <!-- Ad buttons -->
+    <string name="ad_details_button">ПОДРОБНЕЕ 💰</string>
+    <string name="ad_learn_more_button">УЗНАТЬ БОЛЬШЕ 💰</string>
+    <string name="ad_learn_button">УЗНАТЬ 💰</string>
+</resources>

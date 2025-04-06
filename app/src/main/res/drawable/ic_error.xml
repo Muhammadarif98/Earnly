@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Круглый фон -->
+    <path
+        android:fillColor="#FCDFA1"
+        android:pathData="M100,100m-100,0a100,100 0,1 1,200 0a100,100 0,1 1,-200 0"/>
+    
+    <!-- Треугольник предупреждения -->
+    <path
+        android:fillColor="#D73A49"
+        android:pathData="M100,50L150,130L50,130z"/>
+    
+    <!-- Восклицательный знак (белый круг) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,100m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"/>
+    
+    <!-- Восклицательный знак (белая линия) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,75L100,90L100,90L100,75z"/>
+</vector> 
