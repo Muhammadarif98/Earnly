@@ -97,12 +97,34 @@ class ContentRepository(private val context: Context) {
     }
     
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-        
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-               capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        try {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            
+            // Проверяем наличие активного соединения
+            val network = connectivityManager.activeNetwork
+            if (network == null) {
+                android.util.Log.d(TAG, "Нет активной сети")
+                return false
+            }
+            
+            // Проверяем возможности сети
+            val capabilities = connectivityManager.getNetworkCapabilities(network)
+            if (capabilities == null) {
+                android.util.Log.d(TAG, "Сеть без возможностей")
+                return false
+            }
+            
+            // Проверяем наличие интернета и валидацию
+            val hasInternet = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            val isValidated = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            
+            android.util.Log.d(TAG, "Состояние сети: интернет=$hasInternet, валидация=$isValidated")
+            
+            return hasInternet && isValidated
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "Ошибка при проверке сети", e)
+            return false
+        }
     }
     
     fun logContentView(articleId: String) {

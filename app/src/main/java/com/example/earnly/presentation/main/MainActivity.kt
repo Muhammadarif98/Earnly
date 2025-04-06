@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -165,11 +166,23 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun showError(message: String) {
+        android.util.Log.d(TAG, "Показываем экран ошибки: $message")
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.GONE
+        
+        // Используем встроенный errorLayout из activity_main.xml
+        val tvErrorMessage = errorLayout.findViewById<TextView>(R.id.tvErrorMessage)
+        if (tvErrorMessage != null) {
+            tvErrorMessage.text = message
+        } else {
+            // Если TextView с id tvErrorMessage не найден, значит используем стандартный errorLayout
+            // Здесь можно добавить дополнительную логику при необходимости
+            android.util.Log.w(TAG, "TextView tvErrorMessage не найден в errorLayout")
+        }
+        
         errorLayout.visibility = View.VISIBLE
         
-        // Используем уже существующий errorLayout вместо создания нового
+        // Логируем ошибку
         AnalyticsManager.logError("main_content_loading", message)
     }
     
