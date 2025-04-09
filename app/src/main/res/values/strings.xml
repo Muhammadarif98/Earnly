@@ -30,6 +30,6 @@
 
     <!-- Ad buttons -->
     <string name="ad_details_button">ПОДРОБНЕЕ 💰</string>
-    <string name="ad_learn_more_button">УЗНАТЬ БОЛЬШЕ 💰</string>
+    <string name="ad_learn_more">УЗНАТЬ БОЛЬШЕ 💰</string>
     <string name="ad_learn_button">УЗНАТЬ 💰</string>
 </resources>

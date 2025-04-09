@@ -11,65 +11,64 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tvAdLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_orange_light"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="2dp"
+            android:layout_gravity="end"
             android:text="@string/ad_label"
             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivAdImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="45dp"
             android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:contentDescription="@null"
-            android:scaleType="centerInside"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvAdLabel"
             tools:src="@android:drawable/ic_menu_gallery" />
 
         <TextView
             android:id="@+id/tvAdTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             android:textColor="@android:color/black"
-            android:textStyle="bold"
+            android:textSize="24sp"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ivAdImage"
-            tools:text="IN-SHORT-NoDesc" />
+            tools:text="Очень длинный заголовок для проверки отображения inline" />
 
         <TextView
             android:id="@+id/tvAdDescription"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="#757575"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvAdTitle"
-            tools:text="ne null" />
+            tools:text="Здесь у нас достаточно длинное описание, содержащее HTML и проверяющее, как это будет обрабатываться. Поля длинные, кнопки нет." />
 
         <Button
             android:id="@+id/btnAdAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/bg_button_ad"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"

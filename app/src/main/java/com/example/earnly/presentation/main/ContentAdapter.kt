@@ -148,27 +148,96 @@ class ContentAdapter(
         private val orgInfoView: TextView = itemView.findViewById(R.id.tvAdOrgInfo)
         private val actionButton: Button = itemView.findViewById(R.id.btnAdAction)
 
+        // Вспомогательный метод для преобразования dp в пиксели
+        private fun dpToPx(dp: Int): Int {
+            val scale = itemView.context.resources.displayMetrics.density
+            return (dp * scale + 0.5f).toInt()
+        }
+
         fun bind(item: ContentItem) {
-            // Show/hide ad label
-            adLabel.visibility = if (item.shouldShowAdLabel()) View.VISIBLE else View.GONE
+            android.util.Log.d("ContentAdapter", "Binding InlineAdViewHolder with item: ${item.title}")
             
-            titleView.text = item.title
-            descriptionView.text = item.description
-            orgInfoView.text = item.orgInfo
+            // Проверяем наличие валидного описания
+            val hasDescription = !item.description.isNullOrEmpty() && item.description != "ne null"
             
-            // Установка текста кнопки, если есть buttonCaption
-            if (!item.buttonCaption.isNullOrEmpty()) {
-                actionButton.text = item.buttonCaption
-                actionButton.visibility = View.VISIBLE
+            // Проверяем, является ли это специальным баннером по размеру в заголовке
+            val isFullWidthBanner = item.title?.let {
+                it.contains("320X90", ignoreCase = true) || 
+                it.contains("320x90", ignoreCase = true) ||
+                it.contains("320X50", ignoreCase = true) ||
+                it.contains("320x50", ignoreCase = true) ||
+                it.contains("320X250", ignoreCase = true) ||
+                it.contains("320x250", ignoreCase = true)
+            } ?: false
+            
+            if (isFullWidthBanner) {
+                // Если это специальный баннер, показываем только изображение
+                adLabel.visibility = View.GONE
+                titleView.visibility = View.GONE
+                descriptionView.visibility = View.GONE
+                orgInfoView.visibility = View.GONE
+                actionButton.visibility = View.GONE
+                
+                // Настраиваем изображение на всю ширину экрана
+                val layoutParams = imageView.layoutParams as ViewGroup.LayoutParams
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                
+                // Устанавливаем высоту в зависимости от размера баннера
+                if (item.title?.contains("320X50", ignoreCase = true) == true || 
+                    item.title?.contains("320x50", ignoreCase = true) == true) {
+                    layoutParams.height = dpToPx(50)
+                    android.util.Log.d("InlineAdViewHolder", "Отображение баннера 320x50")
+                } else if (item.title?.contains("320X250", ignoreCase = true) == true || 
+                          item.title?.contains("320x250", ignoreCase = true) == true) {
+                    layoutParams.height = dpToPx(250)
+                    android.util.Log.d("InlineAdViewHolder", "Отображение баннера 320x250")
+                } else {
+                    // Для 320x90 и других
+                    layoutParams.height = dpToPx(90)
+                    android.util.Log.d("InlineAdViewHolder", "Отображение баннера 320x90")
+                }
+                
+                imageView.layoutParams = layoutParams
+                imageView.adjustViewBounds = true
+                imageView.scaleType = ImageView.ScaleType.FIT_XY
+                
+                // Убираем все внешние отступы
+                val params = itemView.layoutParams as? ViewGroup.MarginLayoutParams
+                params?.setMargins(0, 0, 0, 0)
+                itemView.layoutParams = params
+                
+                android.util.Log.d("InlineAdViewHolder", "Отображение баннера на всю ширину без отступов")
             } else {
-                actionButton.text = itemView.context.getString(R.string.ad_details_button)
+                // Обычный режим отображения
+                adLabel.visibility = if (item.shouldShowAdLabel()) View.VISIBLE else View.GONE
+                titleView.visibility = View.VISIBLE
+                
+                titleView.text = item.title
+                if (hasDescription) {
+                    descriptionView.text = item.description
+                }
+                
+                orgInfoView.visibility = if (item.orgInfo.isNullOrEmpty()) View.GONE else View.VISIBLE
                 actionButton.visibility = View.VISIBLE
+                
+                // Динамическое масштабирование изображения
+                val layoutParams = imageView.layoutParams
+                // Сохраняем пропорции для динамического масштабирования
+                imageView.adjustViewBounds = true
+                imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                imageView.layoutParams = layoutParams
+                
+                // Установка текста кнопки
+                if (!item.buttonCaption.isNullOrEmpty()) {
+                    actionButton.text = item.buttonCaption
+                } else {
+                    actionButton.text = itemView.context.getString(R.string.ad_details_button)
+                }
+                
+                android.util.Log.d("InlineAdViewHolder", "Отображение в обычном режиме с динамическим масштабированием")
             }
             
-            // Set org info visibility
-            orgInfoView.visibility = if (item.orgInfo.isNullOrEmpty()) View.GONE else View.VISIBLE
-            
-            // Simplified image loading
+            // Загрузка изображения в любом случае
             try {
                 val imageUrl = item.getFullImageUrl()
                 android.util.Log.d("InlineAdViewHolder", "Loading image: $imageUrl")
@@ -188,7 +257,7 @@ class ContentAdapter(
                 imageView.setImageResource(R.drawable.ic_launcher_foreground)
             }
             
-            // Обработка нажатия на кнопку действия
+            // Обработка нажатия на кнопку действия для обычного режима
             actionButton.setOnClickListener { onItemClick(item) }
             
             // Обработка нажатия на весь элемент
@@ -207,23 +276,97 @@ class ContentAdapter(
         private val descriptionView: TextView = itemView.findViewById(R.id.tvAdDescription)
         private val shortIdView: TextView = itemView.findViewById(R.id.tvShortId)
         private val actionButton: Button = itemView.findViewById(R.id.btnAdAction)
+        
+        // Вспомогательный метод для преобразования dp в пиксели
+        private fun dpToPx(dp: Int): Int {
+            val scale = itemView.context.resources.displayMetrics.density
+            return (dp * scale + 0.5f).toInt()
+        }
 
         fun bind(item: ContentItem) {
-            // Show/hide ad label based on flag
-            adLabel.visibility = if (item.shouldShowAdLabel()) View.VISIBLE else View.GONE
+            android.util.Log.d("ContentAdapter", "Binding BannerAdViewHolder with item: ${item.title}")
             
-            // Set title and description
-            titleView.text = item.title
-            descriptionView.text = item.description
+            // Проверяем наличие валидного описания
+            val hasDescription = !item.description.isNullOrEmpty() && item.description != "ne null"
             
-            // Установка текста кнопки, если есть buttonCaption
-            if (!item.buttonCaption.isNullOrEmpty()) {
-                actionButton.text = item.buttonCaption
+            // Проверяем, является ли это специальным баннером по размеру в заголовке
+            val isFullWidthBanner = item.title?.let {
+                it.contains("320X90", ignoreCase = true) || 
+                it.contains("320x90", ignoreCase = true) ||
+                it.contains("320X50", ignoreCase = true) ||
+                it.contains("320x50", ignoreCase = true) ||
+                it.contains("320X250", ignoreCase = true) ||
+                it.contains("320x250", ignoreCase = true)
+            } ?: false
+            
+            if (isFullWidthBanner) {
+                // Если это специальный баннер, показываем только изображение
+                adLabel.visibility = View.GONE
+                titleView.visibility = View.GONE
+                descriptionView.visibility = View.GONE
+                shortIdView.visibility = View.GONE
+                actionButton.visibility = View.GONE
+                
+                // Настраиваем изображение на всю ширину экрана
+                val layoutParams = imageView.layoutParams as ViewGroup.LayoutParams
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                
+                // Устанавливаем высоту в зависимости от размера баннера
+                if (item.title?.contains("320X50", ignoreCase = true) == true || 
+                    item.title?.contains("320x50", ignoreCase = true) == true) {
+                    layoutParams.height = dpToPx(50)
+                    android.util.Log.d("BannerAdViewHolder", "Отображение баннера 320x50")
+                } else if (item.title?.contains("320X250", ignoreCase = true) == true || 
+                          item.title?.contains("320x250", ignoreCase = true) == true) {
+                    layoutParams.height = dpToPx(250)
+                    android.util.Log.d("BannerAdViewHolder", "Отображение баннера 320x250")
+                } else {
+                    // Для 320x90 и других
+                    layoutParams.height = dpToPx(90)
+                    android.util.Log.d("BannerAdViewHolder", "Отображение баннера 320x90")
+                }
+                
+                imageView.layoutParams = layoutParams
+                imageView.adjustViewBounds = true
+                imageView.scaleType = ImageView.ScaleType.FIT_XY
+                
+                // Убираем все внешние отступы
+                val params = itemView.layoutParams as? ViewGroup.MarginLayoutParams
+                params?.setMargins(0, 0, 0, 0)
+                itemView.layoutParams = params
+                
+                android.util.Log.d("BannerAdViewHolder", "Отображение баннера на всю ширину без отступов")
             } else {
-                actionButton.text = itemView.context.getString(R.string.ad_details_button)
+                // Обычный режим отображения
+                adLabel.visibility = if (item.shouldShowAdLabel()) View.VISIBLE else View.GONE
+                titleView.visibility = View.VISIBLE
+                
+                titleView.text = item.title
+                if (hasDescription) {
+                    descriptionView.text = item.description
+                }
+                
+                shortIdView.visibility = View.VISIBLE
+                actionButton.visibility = View.VISIBLE
+                
+                // Динамическое масштабирование изображения
+                val layoutParams = imageView.layoutParams
+                // Сохраняем пропорции для динамического масштабирования
+                imageView.adjustViewBounds = true
+                imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                imageView.layoutParams = layoutParams
+                
+                // Установка текста кнопки
+                if (!item.buttonCaption.isNullOrEmpty()) {
+                    actionButton.text = item.buttonCaption
+                } else {
+                    actionButton.text = itemView.context.getString(R.string.ad_details_button)
+                }
+                
+                android.util.Log.d("BannerAdViewHolder", "Отображение в обычном режиме с динамическим масштабированием")
             }
             
-            // Simplified image loading
+            // Загрузка изображения в любом случае
             try {
                 val imageUrl = item.getFullImageUrl()
                 android.util.Log.d("BannerAdViewHolder", "Loading image: $imageUrl")
@@ -243,7 +386,7 @@ class ContentAdapter(
                 imageView.setImageResource(R.drawable.ic_launcher_foreground)
             }
             
-            // Handle click on action button
+            // Handle click on action button for normal mode
             actionButton.setOnClickListener { onItemClick(item) }
             
             // Handle click on the entire item
