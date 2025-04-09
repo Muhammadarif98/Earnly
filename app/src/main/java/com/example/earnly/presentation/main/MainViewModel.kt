@@ -23,8 +23,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val selectedContent: LiveData<ContentItem?> = _selectedContent
     
     // Используем корректные значения вкладок из ТЗ - ДОЛЖНО СОВПАДАТЬ с MainActivity
-    private val tabs = listOf("surveys", "money", "other")
-    private var currentTab = tabs[0] // начнем с money
+    private val tabs = listOf("surveys","main")
+    private var currentTab = tabs[0]
+    
+    // Кеширование результатов по вкладкам
+    private val cachedResults = mutableMapOf<String, ApiResponse>()
     
     init {
         loadContent(currentTab)
@@ -39,6 +42,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             android.util.Log.d("MainViewModel", "Вкладка изменена на: $currentTab")
         }
         
+        // Проверяем, есть ли кешированный результат для этой вкладки
+        if (cachedResults.containsKey(tab)) {
+            android.util.Log.d("MainViewModel", "Используем кешированные данные для вкладки: $tab")
+            val cachedResponse = cachedResults[tab]
+            _contentState.value = ContentState.Success(cachedResponse!!)
+            return
+        }
+        
         _contentState.value = ContentState.Loading
 
         viewModelScope.launch {
@@ -51,6 +62,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val adCount = items.count { it.isAd() }
                     
                     android.util.Log.d("MainViewModel", "Получены данные: всего ${items.size} элементов, статей: $articleCount, рекламы: $adCount")
+                    
+                    // Кешируем результат
+                    cachedResults[tab] = result.data
+                    
                     _contentState.value = ContentState.Success(result.data)
                 }
                 is Resource.Error -> {
@@ -62,6 +77,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+    }
+    
+    // Принудительная загрузка свежих данных (например, при свайпе для обновления)
+    fun refreshContent() {
+        android.util.Log.d("MainViewModel", "Принудительное обновление контента для вкладки: $currentTab")
+        // Очищаем кеш для текущей вкладки
+        cachedResults.remove(currentTab)
+        // Загружаем свежие данные
+        loadContent(currentTab)
     }
     
     fun onContentItemClicked(item: ContentItem) {

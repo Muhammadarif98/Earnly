@@ -31,17 +31,17 @@ class OnboardingActivity : AppCompatActivity() {
         // Set the onboarding items
         val onboardingItems = listOf(
             OnboardingItem(
-                R.drawable.ic_launcher_foreground, // Replace with actual images
+                R.drawable.onboarding_1,
                 getString(R.string.onboarding_title_1),
                 getString(R.string.onboarding_desc_1)
             ),
             OnboardingItem(
-                R.drawable.ic_launcher_foreground, // Replace with actual images
+                R.drawable.onboarding_2,
                 getString(R.string.onboarding_title_2),
                 getString(R.string.onboarding_desc_2)
             ),
             OnboardingItem(
-                R.drawable.ic_launcher_foreground, // Replace with actual images
+                R.drawable.onboarding_3,
                 getString(R.string.onboarding_title_3),
                 getString(R.string.onboarding_desc_3)
             )

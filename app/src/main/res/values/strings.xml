@@ -3,15 +3,15 @@
     <string name="app_name">Earnly</string>
     
     <!-- Onboarding -->
-    <string name="onboarding_title_1">Share with anyone</string>
-    <string name="onboarding_desc_1">Get access to comprehensive guides on earning opportunities</string>
-    <string name="onboarding_title_2">Access everywhere</string>
-    <string name="onboarding_desc_2">Reach your guides from any device, anytime and anywhere</string>
-    <string name="onboarding_title_3">Save everything</string>
-    <string name="onboarding_desc_3">Keep all your favorite earning guides in one place</string>
-    <string name="onboarding_skip">Skip</string>
-    <string name="onboarding_next">Next</string>
-    <string name="onboarding_start">Get Started</string>
+    <string name="onboarding_title_1">Узнайте о способах заработка</string>
+    <string name="onboarding_desc_1">Получите доступ к проверенным способам заработка в интернете</string>
+    <string name="onboarding_title_2">Выбирайте подходящие варианты</string>
+    <string name="onboarding_desc_2">Найдите способы заработка, которые подходят именно вам</string>
+    <string name="onboarding_title_3">Начните зарабатывать</string>
+    <string name="onboarding_desc_3">Применяйте полученные знания и увеличивайте свой доход</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_start">Начать</string>
     
     <!-- Main Screen -->
     <string name="tab_money_ways">Одни способы заработка</string>

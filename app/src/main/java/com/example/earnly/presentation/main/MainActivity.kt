@@ -4,10 +4,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.earnly.EarnlyApplication
 import com.example.earnly.R
 import com.example.earnly.data.model.ContentItem
@@ -28,13 +31,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var preferenceManager: PreferenceManager
     
     // Тестируем вкладки, указанные в ТЗ
-    private val tabs = listOf("money", "other")
+    private val tabs = listOf("main","other")
     
     // Views
-    private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
+    private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: View
     private lateinit var errorLayout: View
-    private lateinit var btnRetry: android.widget.Button
+    private lateinit var btnRetry: Button
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         errorLayout = findViewById(R.id.errorLayout)
         btnRetry = findViewById(R.id.btnRetry)
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
         
         // Setup RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -92,6 +97,12 @@ class MainActivity : AppCompatActivity() {
             }
         })
         
+        // Setup swipe to refresh
+        swipeRefreshLayout.setOnRefreshListener {
+            android.util.Log.d(TAG, "Обновление контента по свайпу")
+            viewModel.refreshContent()
+        }
+        
         // Handle retry button
         btnRetry.setOnClickListener {
             viewModel.loadContent(tabs[tabLayout.selectedTabPosition])
@@ -106,6 +117,11 @@ class MainActivity : AppCompatActivity() {
             when (state) {
                 is MainViewModel.ContentState.Loading -> showLoading()
                 is MainViewModel.ContentState.Success -> {
+                    // Останавливаем индикатор обновления, если он активен
+                    if (swipeRefreshLayout.isRefreshing) {
+                        swipeRefreshLayout.isRefreshing = false
+                    }
+                    
                     val allItems = state.data.recyclerItems
                     android.util.Log.d(TAG, "==================== API RESPONSE ANALYSIS ====================")
                     android.util.Log.d(TAG, "Received total items: ${allItems.size}")
@@ -129,7 +145,14 @@ class MainActivity : AppCompatActivity() {
                     AnalyticsManager.logEvent("content_displayed", 
                         mapOf("items_count" to allItems.size.toString()))
                 }
-                is MainViewModel.ContentState.Error -> showError(state.message)
+                is MainViewModel.ContentState.Error -> {
+                    // Останавливаем индикатор обновления, если он активен
+                    if (swipeRefreshLayout.isRefreshing) {
+                        swipeRefreshLayout.isRefreshing = false
+                    }
+                    
+                    showError(state.message)
+                }
             }
         }
         

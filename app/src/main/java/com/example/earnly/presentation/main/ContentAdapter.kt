@@ -257,10 +257,6 @@ class ContentAdapter(
                 imageView.setImageResource(R.drawable.ic_launcher_foreground)
             }
             
-            // Обработка нажатия на кнопку действия для обычного режима
-            actionButton.setOnClickListener { onItemClick(item) }
-            
-            // Обработка нажатия на весь элемент
             itemView.setOnClickListener { onItemClick(item) }
         }
     }
@@ -274,8 +270,7 @@ class ContentAdapter(
         private val imageView: ImageView = itemView.findViewById(R.id.ivAdImage)
         private val titleView: TextView = itemView.findViewById(R.id.tvAdTitle)
         private val descriptionView: TextView = itemView.findViewById(R.id.tvAdDescription)
-        private val shortIdView: TextView = itemView.findViewById(R.id.tvShortId)
-        private val actionButton: Button = itemView.findViewById(R.id.btnAdAction)
+        private val actionButton: TextView = itemView.findViewById(R.id.btnAdAction)
         
         // Вспомогательный метод для преобразования dp в пиксели
         private fun dpToPx(dp: Int): Int {
@@ -304,7 +299,6 @@ class ContentAdapter(
                 adLabel.visibility = View.GONE
                 titleView.visibility = View.GONE
                 descriptionView.visibility = View.GONE
-                shortIdView.visibility = View.GONE
                 actionButton.visibility = View.GONE
                 
                 // Настраиваем изображение на всю ширину экрана
@@ -346,7 +340,6 @@ class ContentAdapter(
                     descriptionView.text = item.description
                 }
                 
-                shortIdView.visibility = View.VISIBLE
                 actionButton.visibility = View.VISIBLE
                 
                 // Динамическое масштабирование изображения

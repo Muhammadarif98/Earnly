@@ -1,8 +1,27 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Earnly" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Earnly" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Earnly.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Earnly.Subtitle1</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Earnly.Body1</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.Earnly.Caption</item>
+        <item name="textAppearanceButton">@style/TextAppearance.Earnly.Button</item>
+        
+        <!-- Стандартный радиус для всех компонентов -->
+        <item name="cornerRadius">8dp</item>
+        
+        <!-- Стандартная тень для всех компонентов -->
+        <item name="cardElevation">4dp</item>
     </style>
 
     <style name="Theme.Earnly" parent="Base.Theme.Earnly" />
@@ -10,5 +29,69 @@
     <style name="Theme.Earnly.NoActionBar" parent="Theme.Earnly">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+    
+    <!-- Текстовые стили -->
+    <style name="TextAppearance.Earnly.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    
+    <style name="TextAppearance.Earnly.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    
+    <style name="TextAppearance.Earnly.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    
+    <style name="TextAppearance.Earnly.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    
+    <style name="TextAppearance.Earnly.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+    
+    <!-- Стили для карточек -->
+    <style name="Widget.Earnly.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="contentPadding">16dp</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+    </style>
+    
+    <!-- Стиль для кнопок -->
+    <style name="Widget.Earnly.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAppearance">@style/TextAppearance.Earnly.Button</item>
+        <item name="backgroundTint">@color/accent</item>
+        <item name="cornerRadius">4dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
+    </style>
+    
+    <!-- Стиль для текстовых кнопок -->
+    <style name="Widget.Earnly.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/accent</item>
+        <item name="rippleColor">@color/ripple</item>
+    </style>
+    
+    <!-- Стиль для Ripple-эффекта -->
+    <style name="Ripple.Earnly" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorControlHighlight">@color/ripple</item>
     </style>
 </resources>

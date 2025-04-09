@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="@string/onboarding_skip"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@color/blue_500"
         app:layout_constraintBottom_toBottomOf="@+id/layoutControls"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/layoutControls" />
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:backgroundTint="@android:color/holo_blue_light"
+        android:backgroundTint="@color/blue_500"
         android:text="@string/onboarding_next"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/layoutControls"
@@ -52,10 +52,8 @@
         android:id="@+id/layoutControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
         android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-    </FrameLayout>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout> 

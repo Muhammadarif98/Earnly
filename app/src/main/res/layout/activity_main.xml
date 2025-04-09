@@ -5,21 +5,30 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/background"
     tools:context=".presentation.main.MainActivity">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:elevation="4dp"
-        app:tabIndicatorColor="@android:color/holo_blue_light"
-        app:tabSelectedTextColor="@android:color/holo_blue_light"
-        app:tabTextColor="@android:color/darker_gray"
+        android:background="@color/primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            app:tabIndicatorColor="@color/white"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/white"
+            app:tabIndicatorHeight="3dp"
+            app:tabMode="fixed" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
         android:id="@+id/container"
@@ -28,21 +37,33 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabLayout">
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="8dp"
-            android:visibility="visible" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:scrollbars="vertical"
+                android:scrollbarStyle="outsideOverlay"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:visibility="visible" />
+                
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
+            android:indeterminateTint="@color/primary"
             android:visibility="gone" />
 
         <LinearLayout
@@ -53,15 +74,16 @@
             android:gravity="center"
             android:orientation="vertical"
             android:padding="16dp"
-            android:background="@android:color/white"
+            android:background="@color/background"
             android:visibility="gone">
 
             <ImageView
                 android:id="@+id/imgError"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/ic_error"
-                android:contentDescription="@null" />
+                android:contentDescription="@null"
+                android:alpha="0.7" />
 
             <TextView
                 android:id="@+id/tvErrorMessage"
@@ -71,10 +93,10 @@
                 android:layout_marginTop="24dp"
                 android:gravity="center"
                 android:text="@string/error_no_internet"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                android:textAppearance="@style/TextAppearance.Earnly.Subtitle1"
+                android:textColor="@color/text_primary" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRetry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,8 +105,26 @@
                 android:paddingVertical="12dp"
                 android:text="@string/retry"
                 android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:background="@drawable/bg_button_retry" />
+                android:backgroundTint="@color/primary"
+                android:elevation="2dp"
+                app:cornerRadius="8dp"
+                android:textColor="@color/white"
+                style="@style/Widget.Earnly.Button" />
+        </LinearLayout>
+        
+        <!-- Контейнер для скелетон-лоадера -->
+        <LinearLayout
+            android:id="@+id/skeletonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+        
+            <include layout="@layout/item_skeleton_article" />
+            <include layout="@layout/item_skeleton_article" />
+            <include layout="@layout/item_skeleton_article" />
+            <include layout="@layout/item_skeleton_article" />
+        
         </LinearLayout>
     </FrameLayout>
 
