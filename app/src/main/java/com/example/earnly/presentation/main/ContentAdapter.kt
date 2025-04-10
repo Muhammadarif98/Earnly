@@ -12,39 +12,55 @@ import com.bumptech.glide.Glide
 import com.example.earnly.R
 import com.example.earnly.data.model.ContentItem
 
+/**
+ * Адаптер для отображения контента в RecyclerView.
+ * Поддерживает различные типы элементов: статьи и рекламные блоки.
+ * 
+ * @param onItemClick Обработчик клика по элементу списка
+ */
 class ContentAdapter(
     private val onItemClick: (ContentItem) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    // Список отображаемых элементов
     private val items = mutableListOf<ContentItem>()
 
     companion object {
+        // Типы элементов для RecyclerView
         private const val VIEW_TYPE_ARTICLE = 0
         private const val VIEW_TYPE_INLINE_AD = 1
         private const val VIEW_TYPE_BANNER = 2
     }
 
+    /**
+     * Устанавливает новый список элементов для отображения
+     * @param newItems Список элементов контента
+     */
     fun setItems(newItems: List<ContentItem>) {
         android.util.Log.d("ContentAdapter", "Установка ${newItems.size} элементов в адаптер")
         
-        // Анализ типов элементов
+        // Группируем элементы по типам для статистики
         val articles = newItems.filter { it.contentType == "article" }
         val banners = newItems.filter { it.contentType == "banner" }
         val inlineAds = newItems.filter { it.contentType == "inline_ad" || it.contentType == "item_ad" }
         
         android.util.Log.d("ContentAdapter", "Типы элементов: статьи=${articles.size}, баннеры=${banners.size}, реклама=${inlineAds.size}")
         
+        // Обновляем данные и уведомляем адаптер
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()
 
-        // Логирование для отладки
+        // Логируем содержимое для отладки
         newItems.forEachIndexed { index, item ->
             android.util.Log.d("ContentAdapter",
                 "Item $index: ${item.contentType}, title=${item.title?.take(10)}...")
         }
     }
 
+    /**
+     * Определяет тип элемента на указанной позиции
+     */
     override fun getItemViewType(position: Int): Int {
         val item = items[position]
         return when {
@@ -63,6 +79,9 @@ class ContentAdapter(
         }
     }
 
+    /**
+     * Создает ViewHolder в зависимости от типа элемента
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_ARTICLE -> {
@@ -94,7 +113,9 @@ class ContentAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    // ViewHolder for Articles
+    /**
+     * ViewHolder для отображения статей
+     */
     inner class ArticleViewHolder(
         itemView: View,
         private val onItemClick: (ContentItem) -> Unit
@@ -103,16 +124,20 @@ class ContentAdapter(
         private val titleView: TextView = itemView.findViewById(R.id.tvArticleTitle)
         private val descriptionView: TextView = itemView.findViewById(R.id.tvArticleDescription)
 
+        /**
+         * Заполняет элемент данными статьи
+         */
         fun bind(item: ContentItem) {
+            // Устанавливаем заголовок
             titleView.text = item.title
             
-            // Clean HTML for preview
+            // Очищаем HTML-разметку для предпросмотра
             val description = item.description?.let {
                 Html.fromHtml(it, Html.FROM_HTML_MODE_COMPACT).toString()
             } ?: ""
             descriptionView.text = description
             
-            // Simplified image loading
+            // Загружаем изображение
             try {
                 val imageUrl = item.getFullImageUrl()
                 android.util.Log.d("ArticleViewHolder", "Loading image: $imageUrl")
@@ -124,14 +149,17 @@ class ContentAdapter(
                         .error(R.drawable.ic_launcher_foreground)
                         .into(imageView)
                 } else {
+                    // Если URL отсутствует, показываем заглушку
                     imageView.setImageResource(R.drawable.ic_launcher_foreground)
                     android.util.Log.w("ArticleViewHolder", "No image URL for article: ${item.title}")
                 }
             } catch (e: Exception) {
+                // Обрабатываем ошибки загрузки изображения
                 android.util.Log.e("ArticleViewHolder", "Error loading image for: ${item.title}", e)
                 imageView.setImageResource(R.drawable.ic_launcher_foreground)
             }
             
+            // Устанавливаем обработчик клика на карточку статьи
             itemView.setOnClickListener { onItemClick(item) }
         }
     }
