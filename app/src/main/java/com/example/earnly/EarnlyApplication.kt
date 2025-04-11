@@ -18,8 +18,7 @@ class EarnlyApplication : Application() {
         const val APP_KEY = "com.myapp1"
         
         // Ключ AppMetrica для аналитики
-        // TODO: При публикации обновить на реальный ключ
-        const val APPMETRICA_API_KEY = ""
+        const val APPMETRICA_API_KEY = "83750483-ef87-4e81-a688-4b9c233cfb81"
     }
 
     override fun onCreate() {

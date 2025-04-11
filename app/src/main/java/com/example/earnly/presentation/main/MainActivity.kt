@@ -19,6 +19,7 @@ import com.example.earnly.domain.analytics.AnalyticsManager
 import com.example.earnly.presentation.article.ArticleDetailActivity
 import com.example.earnly.presentation.onboarding.OnboardingActivity
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -72,6 +73,22 @@ class MainActivity : AppCompatActivity() {
             onContentItemClicked(item)
         }
         recyclerView.adapter = contentAdapter
+        
+        // Track scroll depth
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                
+                if (totalItemCount > 0) {
+                    val scrollPercentage = (lastVisibleItem.toFloat() / totalItemCount.toFloat() * 100).toInt()
+                    AnalyticsManager.logScrollDepth("main_screen", scrollPercentage)
+                }
+            }
+        })
         
         // Setup tabs
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
@@ -210,24 +227,41 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun onContentItemClicked(item: ContentItem) {
-        if (item.isArticle()) {
-            item.articleId?.let { articleId ->
-                AnalyticsManager.logArticleView(articleId, item.title ?: "Unknown")
-                viewModel.onContentItemClicked(item)
+        when (item.contentType) {
+            "article" -> {
+                // Track article click
+                AnalyticsManager.logArticleView(item.articleId ?: "unknown", item.title ?: "Unknown title")
+                
+                // Open article detail
+                val intent = Intent(this, ArticleDetailActivity::class.java)
+                intent.putExtra(ArticleDetailActivity.EXTRA_CONTENT_ITEM, item)
+                startActivity(intent)
             }
-        } else if (item.isAd()) {
-            item.bannerId?.let { bannerId ->
-                val placement = when (item.contentType) {
-                    "inline_ad" -> "inline"
-                    "banner" -> "banner"
-                    else -> "item_ad"
+            "banner", "inline_ad", "item_ad" -> {
+                // Track ad click
+                AnalyticsManager.logAdClick(item.bannerId ?: "unknown", 
+                    when (item.contentType) {
+                        "inline_ad" -> "inline"
+                        "banner" -> "banner"
+                        else -> "item_ad"
+                    }
+                )
+                
+                // Open ad link
+                val adUrl = "https://dohodinfor.ru/?app_key=${EarnlyApplication.APP_KEY}&ad_id=${item.bannerId}&placement=${
+                    when (item.contentType) {
+                        "inline_ad" -> "inline"
+                        "banner" -> "banner"
+                        else -> "item_ad"
+                    }
+                }"
+                
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(adUrl))
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    AnalyticsManager.logError("main_ad_click", "Failed to open URL: $adUrl")
                 }
-                
-                AnalyticsManager.logAdClick(bannerId, placement)
-                
-                // Open browser with ad URL
-                val adUrl = "https://dohodinfor.ru/?app_key=${EarnlyApplication.APP_KEY}&ad_id=$bannerId&placement=$placement"
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(adUrl)))
             }
         }
     }

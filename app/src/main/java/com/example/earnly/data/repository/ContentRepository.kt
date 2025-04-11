@@ -33,13 +33,14 @@ class ContentRepository(private val context: Context) {
     suspend fun getContentForTab(tab: String): Resource<ApiResponse> {
         // Проверяем подключение к интернету
         if (!isNetworkAvailable()) {
-            AnalyticsManager.logEvent("network_not_available", 
-                mapOf("tab" to tab))
+            AnalyticsManager.logError("network", "Network not available for tab: $tab")
             return Resource.Error("Отсутствует подключение к интернету. Проверьте интернет-соединение и повторите попытку.")
         }
         
         // Если есть подключение, пытаемся загрузить данные
         return try {
+            val startTime = System.currentTimeMillis()
+            
             val request = ApiRequest(
                 user = userId,
                 key = EarnlyApplication.APP_KEY,
@@ -53,7 +54,20 @@ class ContentRepository(private val context: Context) {
             android.util.Log.d(TAG, "Full request data: $request")
             android.util.Log.d(TAG, "=========================================================")
             
+            // Логируем начало запроса
+            AnalyticsManager.logEvent("api_request_start", mapOf(
+                "tab" to tab,
+                "timestamp" to System.currentTimeMillis().toString()
+            ))
+            
             val response = NetworkModule.apiService.getData(request)
+            val responseTime = System.currentTimeMillis() - startTime
+            
+            // Логируем время ответа API
+            AnalyticsManager.logEvent("api_response_time", mapOf(
+                "tab" to tab,
+                "response_time_ms" to responseTime.toString()
+            ))
             
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
@@ -76,22 +90,31 @@ class ContentRepository(private val context: Context) {
                     }
                     android.util.Log.d(TAG, "===========================================================")
                     
-                    AnalyticsManager.logEvent("content_fetched_success", 
-                        mapOf("tab" to tab, "items_count" to apiResponse.recyclerItems.size.toString()))
+                    // Детальное логирование успешной загрузки
+                    AnalyticsManager.logEvent("content_fetched_success", mapOf(
+                        "tab" to tab, 
+                        "items_count" to apiResponse.recyclerItems.size.toString(),
+                        "articles_count" to articleCount.toString(),
+                        "ads_count" to adCount.toString(),
+                        "response_time_ms" to responseTime.toString()
+                    ))
+                    
                     Resource.Success(apiResponse)
-                } ?: Resource.Error("Ошибка получения данных с сервера. Проверьте интернет-соединение и повторите попытку.")
+                } ?: run {
+                    // Логируем ошибку пустого тела ответа
+                    AnalyticsManager.logError("api_response", "Empty response body for tab: $tab")
+                    Resource.Error("Ошибка получения данных с сервера. Проверьте интернет-соединение и повторите попытку.")
+                }
             } else {
                 // Логируем ошибку API
                 android.util.Log.e(TAG, "API error: ${response.code()} - ${response.message()}")
-                AnalyticsManager.logEvent("content_fetch_error", 
-                    mapOf("error_code" to response.code().toString()))
+                AnalyticsManager.logError("api_response", "API error: ${response.code()} - ${response.message()} for tab: $tab")
                 Resource.Error("Ошибка получения данных с сервера. Проверьте интернет-соединение и повторите попытку.")
             }
         } catch (e: Exception) {
             // Логируем ошибку
             android.util.Log.e(TAG, "Error fetching content: ${e.message}", e)
-            AnalyticsManager.logEvent("content_fetch_exception", 
-                mapOf("error" to e.message.toString()))
+            AnalyticsManager.logError("api_exception", "Exception loading content for tab: $tab: ${e.message}")
             Resource.Error("Ошибка получения данных с сервера. Проверьте интернет-соединение и повторите попытку.")
         }
     }
@@ -128,16 +151,10 @@ class ContentRepository(private val context: Context) {
     }
     
     fun logContentView(articleId: String) {
-        AnalyticsManager.logEvent("article_viewed", 
-            mapOf("article_id" to articleId))
+        AnalyticsManager.logArticleView(articleId, "Unknown title")
     }
     
     fun logAdClick(bannerId: String, placement: String) {
-        AnalyticsManager.logEvent("ad_clicked", 
-            mapOf(
-                "app_key" to EarnlyApplication.APP_KEY,
-                "ad_id" to bannerId,
-                "placement" to placement
-            ))
+        AnalyticsManager.logAdClick(bannerId, placement)
     }
 } 

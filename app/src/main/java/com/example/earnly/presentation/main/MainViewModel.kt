@@ -51,26 +51,52 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         
         _contentState.value = ContentState.Loading
+        
+        // Логируем начало загрузки контента
+        AnalyticsManager.logContentLoadStart(tab)
+        val startTime = System.currentTimeMillis()
 
         viewModelScope.launch {
             android.util.Log.d("MainViewModel", "Запрос данных в репозиторий для вкладки: $tab")
             when (val result = repository.getContentForTab(tab)) {
                 is Resource.Success -> {
+                    val loadTime = System.currentTimeMillis() - startTime
+                    
                     // Анализируем результат
-                    val items = result.data.recyclerItems
+                    val items = result.data?.recyclerItems ?: emptyList()
                     val articleCount = items.count { it.contentType == "article" }
                     val adCount = items.count { it.isAd() }
                     
                     android.util.Log.d("MainViewModel", "Получены данные: всего ${items.size} элементов, статей: $articleCount, рекламы: $adCount")
                     
-                    // Кешируем результат
-                    cachedResults[tab] = result.data
+                    // Логируем успешную загрузку
+                    AnalyticsManager.logContentLoadSuccess(tab, items.size, loadTime)
                     
-                    _contentState.value = ContentState.Success(result.data)
+                    // Для каждого рекламного блока логируем отображение
+                    items.filter { it.isAd() }.forEach { adItem ->
+                        adItem.bannerId?.let { bannerId ->
+                            val placement = when {
+                                adItem.contentType == "inline_ad" -> "inline"
+                                adItem.contentType == "banner" -> "banner"
+                                else -> "item_ad"
+                            }
+                            AnalyticsManager.logAdImpression(bannerId, placement)
+                        }
+                    }
+                    
+                    // Кешируем результат
+                    result.data?.let { cachedResults[tab] = it }
+                    
+                    _contentState.value = result.data?.let { ContentState.Success(it) } 
+                        ?: ContentState.Error("Empty response")
                 }
                 is Resource.Error -> {
                     android.util.Log.e("MainViewModel", "Ошибка загрузки: ${result.message}")
-                    _contentState.value = ContentState.Error(result.message)
+                    
+                    // Логируем ошибку
+                    AnalyticsManager.logError("content_loading", "Failed to load content for tab: $tab, ${result.message}")
+                    
+                    _contentState.value = ContentState.Error(result.message ?: "Unknown error")
                 }
                 is Resource.Loading -> {
                     _contentState.value = ContentState.Loading
@@ -82,8 +108,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Принудительная загрузка свежих данных (например, при свайпе для обновления)
     fun refreshContent() {
         android.util.Log.d("MainViewModel", "Принудительное обновление контента для вкладки: $currentTab")
+        
+        // Логируем событие обновления
+        AnalyticsManager.logEvent("content_refresh", mapOf("tab" to currentTab))
+        
         // Очищаем кеш для текущей вкладки
         cachedResults.remove(currentTab)
+        
         // Загружаем свежие данные
         loadContent(currentTab)
     }

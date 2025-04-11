@@ -1,105 +1,168 @@
 # Earnly
 
-Приложение для чтения статей с интегрированными рекламными блоками.
+Android приложение для просмотра статей и рекламных баннеров.
 
 ## Требования
 
-- Android Studio Giraffe (2022.3.1) или новее
-- JDK 8 или новее
-- Android SDK API Level 28+
-- Gradle 8.2
+- Android Studio Hedgehog | 2023.1.1
+- Android SDK 34 (Android 14)
+- Gradle 8.2.2
+- Kotlin 1.9.0
+- JDK 17
 
-## Как запустить проект
+## Зависимости
 
+### Инструменты сборки
+- Android Gradle Plugin: 8.2.2
+- Kotlin Gradle Plugin: 1.9.0
+- Gradle: 8.2.2
+
+### Основные библиотеки
+- AndroidX Core: 1.12.0
+- AndroidX AppCompat: 1.6.1
+- Material Design: 1.11.0
+- ConstraintLayout: 2.1.4
+- Navigation: 2.7.7
+- SwipeRefreshLayout: 1.1.0
+- Lifecycle: 2.7.0 (ViewModel, LiveData)
+
+### Сетевые библиотеки
+- Retrofit: 2.9.0
+- Moshi: 1.14.0
+- OkHttp: 4.12.0
+- OkHttp Logging Interceptor: 4.12.0
+
+### Дополнительные библиотеки
+- Glide: 4.16.0
+- Yandex Metrica: 5.3.0
+
+## Логирование и аналитика
+
+### Аналитика AppMetrica
+
+В приложении используется Яндекс AppMetrica для отслеживания активности пользователей. API ключ: `83750483-ef87-4e81-a688-4b9c233cfb81`
+
+### Отслеживаемые события
+
+#### Загрузка контента
+- Начало загрузки контента
+- Успешная загрузка контента
+- Ошибки загрузки контента
+- Время загрузки контента
+
+#### Просмотр контента
+- Открытие статьи
+- Просмотр времени на статье
+- Прокрутка контента
+- Закрытие статьи
+
+#### Рекламные блоки
+- Загрузка рекламных блоков
+- Отображение рекламы
+- Клики по рекламе
+- Ошибки загрузки рекламы
+
+#### Навигация
+- Переключение между табами
+- Открытие экранов
+- Возврат на предыдущий экран
+
+### Параметры событий
+- `app_key` - идентификатор приложения
+- `ad_id` - идентификатор рекламного блока
+- `placement` - место размещения рекламы
+- `content_id` - идентификатор контента
+- `content_type` - тип контента
+- `error_message` - сообщение об ошибке
+- `duration` - длительность просмотра
+- `scroll_depth` - глубина прокрутки
+
+## Настройка и запуск проекта
+
+### Подготовка окружения
+1. Установите Android Studio Hedgehog (2023.1.1) или новее
+2. Установите JDK 17
+3. Установите Android SDK 34 (Android 14)
+4. Убедитесь, что в Android Studio настроены:
+   - Android SDK
+   - Gradle 8.2.2
+   - Kotlin 1.9.0
+
+### Импорт и сборка проекта
 1. Клонируйте репозиторий:
-```
-git clone <repository-url>
-```
+   ```bash
+   git clone <repository-url>
+   ```
 
 2. Откройте проект в Android Studio:
-   - Выберите "Open an existing Android Studio project"
-   - Укажите путь к папке с клонированным проектом
-   - Нажмите "OK"
+   - File -> Open -> выберите папку с проектом
+   - Дождитесь завершения индексации и синхронизации Gradle
 
-3. Дождитесь завершения инициализации Gradle (автоматическая синхронизация)
-   - В случае ошибок синхронизации, нажмите "Sync Project with Gradle Files" в верхней панели
+3. Синхронизация зависимостей:
+   - File -> Sync Project with Gradle Files
+   - Или нажмите кнопку "Sync Now" в уведомлении Gradle
 
-4. Для запуска проекта:
-   - Выберите устройство (эмулятор или подключенное физическое устройство)
-   - Нажмите "Run" (зеленый треугольник) или используйте комбинацию Shift+F10
-   - Дождитесь установки и запуска приложения
+4. Сборка проекта:
+   - Build -> Make Project (Ctrl+F9)
+   - Или используйте командную строку:
+     ```bash
+     ./gradlew assembleDebug
+     ```
 
-## Сборка APK
-
-Для сборки APK-файла:
-
-1. В Android Studio выберите меню "Build" -> "Build Bundle(s) / APK(s)" -> "Build APK(s)"
-2. После завершения сборки нажмите на ссылку "locate" для открытия папки с APK
-3. APK-файл будет находиться в директории `app/build/outputs/apk/debug/app-debug.apk`
-
-Альтернативно, можно использовать командную строку:
-```
-./gradlew assembleDebug
-```
-
-## Особенности проекта
-
-- Использует Kotlin в качестве основного языка программирования
-- Retrofit для работы с API (POST запросы)
-- AppMetrica для аналитики (логирование просмотров контента, кликов по рекламе)
-- Material Design компоненты для современного пользовательского интерфейса
-- Поддержка просмотра статей и различных типов рекламных блоков
+### Запуск приложения
+1. Подключите Android устройство или запустите эмулятор
+2. В Android Studio:
+   - Выберите устройство в выпадающем списке
+   - Нажмите Run (Shift+F10)
+3. Или используйте командную строку:
+   ```bash
+   ./gradlew installDebug
+   ```
 
 ## Структура проекта
 
-- `app/src/main/java/com/example/earnly/data`: Классы для работы с данными и API
-- `app/src/main/java/com/example/earnly/domain`: Доменный слой (аналитика, утилиты)
-- `app/src/main/java/com/example/earnly/presentation`: Экраны приложения (активности, адаптеры)
-- `app/src/main/res`: Ресурсы приложения (макеты, стили, изображения)
+```
+app/
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/earnly/
+│   │   │   ├── data/
+│   │   │   │   ├── api/
+│   │   │   │   ├── model/
+│   │   │   │   └── repository/
+│   │   │   ├── domain/
+│   │   │   │   ├── analytics/
+│   │   │   │   └── usecase/
+│   │   │   └── presentation/
+│   │   │       ├── article/
+│   │   │       └── main/
+│   │   └── res/
+│   └── test/
+└── build.gradle.kts
+```
 
-## Зависимости и их версии
+## Особенности
 
-### Инструменты сборки
-- Gradle: 8.2
-- Android Gradle Plugin: 8.1.4
-- Kotlin: 1.9.22
+- Поддержка Android 9.0 (API 28) и выше
+- Адаптивные иконки
+- ViewBinding для работы с макетами
+- Навигация через Navigation Component
+- Аналитика через Yandex Metrica
+- Кэширование изображений через Glide
+- Pull-to-refresh функционал
+- Полное логирование всех пользовательских действий
+- Отслеживание производительности загрузки контента
 
-### AndroidX
-- Core KTX: 1.12.0
-- AppCompat: 1.6.1
-- Material: 1.11.0
-- Activity KTX: 1.8.2
-- ConstraintLayout: 2.1.4
-- Lifecycle (ViewModel, LiveData, Runtime): 2.6.2
-- ViewPager2: 1.0.0
-- Fragment KTX: 1.6.2
-- SwipeRefreshLayout: 1.1.0
+## Тестирование
 
-### Сетевое взаимодействие
-- Retrofit: 2.9.0
-- Retrofit Moshi Converter: 2.9.0
-- OkHttp: 4.11.0
-- OkHttp Logging Interceptor: 4.11.0
+```bash
+# Запуск всех тестов
+./gradlew test
 
-### Работа с JSON
-- Moshi: 1.14.0
-- Moshi Kotlin: 1.14.0
-
-### Загрузка изображений
-- Glide: 4.15.1
-- Glide OkHttp Integration: 4.15.1
-
-### Аналитика
-- AppMetrica: 5.2.0
-
-### Асинхронное программирование
-- Coroutines Android: 1.7.1
-
-### Тестирование
-- JUnit: 4.13.2
-- AndroidX Test JUnit: 1.1.5
-- Espresso Core: 3.5.1
+# Запуск тестов с отчетом о покрытии
+./gradlew testDebugUnitTestCoverage
+```
 
 ## Лицензия
 
-Проект распространяется под лицензией MIT License. 
+MIT License 
