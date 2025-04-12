@@ -49,7 +49,7 @@ class ArticleDetailActivity : AppCompatActivity() {
         }
         
         // Get the content item from the intent
-        contentItem = intent.getSerializableExtra(EXTRA_CONTENT_ITEM) as? ContentItem
+        contentItem = intent.getSerializableExtra(getString(R.string.extra_content_item)) as? ContentItem
         
         if (contentItem == null) {
             finish()
@@ -57,11 +57,14 @@ class ArticleDetailActivity : AppCompatActivity() {
         }
         
         // Log screen view
-        AnalyticsManager.logScreenView("article_detail")
+        AnalyticsManager.logScreenView(getString(R.string.article_detail_screen))
         
         // Log article view
         contentItem?.let { article ->
-            AnalyticsManager.logArticleView(article.articleId ?: "unknown", article.title ?: "Unknown")
+            AnalyticsManager.logArticleView(
+                article.articleId ?: getString(R.string.unknown_title), 
+                article.title ?: getString(R.string.unknown_title)
+            )
         }
         
         // Load ads
@@ -79,8 +82,14 @@ class ArticleDetailActivity : AppCompatActivity() {
     private fun logArticleCloseEvent() {
         contentItem?.let { article ->
             val timeSpentSec = ((System.currentTimeMillis() - articleOpenTime) / 1000).toInt()
-            AnalyticsManager.logArticleClose(article.articleId ?: "unknown", timeSpentSec)
-            AnalyticsManager.logArticleViewDuration(article.articleId ?: "unknown", timeSpentSec)
+            AnalyticsManager.logArticleClose(
+                article.articleId ?: getString(R.string.unknown_title), 
+                timeSpentSec
+            )
+            AnalyticsManager.logArticleViewDuration(
+                article.articleId ?: getString(R.string.unknown_title), 
+                timeSpentSec
+            )
         }
     }
     
@@ -89,11 +98,11 @@ class ArticleDetailActivity : AppCompatActivity() {
             val loadStartTime = System.currentTimeMillis()
             
             // Log ad load start
-            AnalyticsManager.logAdLoadStart("article_top")
-            AnalyticsManager.logAdLoadStart("article_bottom")
+            AnalyticsManager.logAdLoadStart(getString(R.string.article_top_placement))
+            AnalyticsManager.logAdLoadStart(getString(R.string.article_bottom_placement))
             
             try {
-                val response = repository.getContentForTab("money") // Используем текущую вкладку
+                val response = repository.getContentForTab(getString(R.string.money_tab)) // Используем текущую вкладку
                 when (response) {
                     is Resource.Success -> {
                         val loadTime = System.currentTimeMillis() - loadStartTime
@@ -102,13 +111,21 @@ class ArticleDetailActivity : AppCompatActivity() {
                             // Get top ad
                             topAdItem = apiResponse.topAdItems.firstOrNull()
                             topAdItem?.let { ad ->
-                                AnalyticsManager.logAdLoadSuccess(ad.bannerId ?: "unknown", "article_top", loadTime)
+                                AnalyticsManager.logAdLoadSuccess(
+                                    ad.bannerId ?: getString(R.string.unknown_title), 
+                                    getString(R.string.article_top_placement), 
+                                    loadTime
+                                )
                             }
                             
                             // Get bottom ad
                             bottomAdItem = apiResponse.bottomAdItems.firstOrNull()
                             bottomAdItem?.let { ad ->
-                                AnalyticsManager.logAdLoadSuccess(ad.bannerId ?: "unknown", "article_bottom", loadTime)
+                                AnalyticsManager.logAdLoadSuccess(
+                                    ad.bannerId ?: getString(R.string.unknown_title), 
+                                    getString(R.string.article_bottom_placement), 
+                                    loadTime
+                                )
                             }
                             
                             // Setup ads
@@ -117,7 +134,10 @@ class ArticleDetailActivity : AppCompatActivity() {
                     }
                     is Resource.Error -> {
                         // Log error but continue showing article
-                        AnalyticsManager.logError("article_detail_ads", "Failed to load ads: ${response.message}")
+                        AnalyticsManager.logError(
+                            getString(R.string.article_detail_ads_error), 
+                            getString(R.string.error_loading_ads, response.message)
+                        )
                     }
                     is Resource.Loading -> {
                         // Do nothing, wait for success or error
@@ -125,7 +145,10 @@ class ArticleDetailActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 // Log error but continue showing article
-                AnalyticsManager.logError("article_detail_ads", "Failed to load ads: ${e.message ?: "Unknown error"}")
+                AnalyticsManager.logError(
+                    getString(R.string.article_detail_ads_error), 
+                    getString(R.string.error_loading_ads, e.message ?: getString(R.string.unknown_error))
+                )
             }
         }
     }
@@ -134,14 +157,14 @@ class ArticleDetailActivity : AppCompatActivity() {
         // Setup top ad if available
         topAdItem?.let {
             if (contentItem?.shouldShowTopAd() == true) {
-                setupAdContainer(findViewById(R.id.topAdContainer), it, "article_top")
+                setupAdContainer(findViewById(R.id.topAdContainer), it, getString(R.string.article_top_placement))
             }
         }
         
         // Setup bottom ad if available
         bottomAdItem?.let {
             if (contentItem?.shouldShowBottomAd() == true) {
-                setupAdContainer(findViewById(R.id.bottomAdContainer), it, "article_bottom")
+                setupAdContainer(findViewById(R.id.bottomAdContainer), it, getString(R.string.article_bottom_placement))
             }
         }
     }
@@ -169,7 +192,7 @@ class ArticleDetailActivity : AppCompatActivity() {
         adLabelView.visibility = if (adItem.shouldShowAdLabel()) View.VISIBLE else View.GONE
         
         // Set button text
-        adButton.text = adItem.buttonCaption ?: "LEARN MORE 💰"
+        adButton.text = adItem.buttonCaption ?: getString(R.string.learn_more)
         
         // Load image
         adItem.getFullImageUrl()?.let { imageUrl ->
@@ -181,7 +204,7 @@ class ArticleDetailActivity : AppCompatActivity() {
         // Set click listener for the button
         adButton.setOnClickListener {
             // Log ad click
-            AnalyticsManager.logAdClick(adItem.bannerId ?: "unknown", placement)
+            AnalyticsManager.logAdClick(adItem.bannerId ?: getString(R.string.unknown_title), placement)
             
             // Open ad link
             val adUrl = "https://dohodinfor.ru/?app_key=${EarnlyApplication.APP_KEY}&ad_id=${adItem.bannerId}&placement=$placement"
@@ -189,12 +212,15 @@ class ArticleDetailActivity : AppCompatActivity() {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(adUrl))
                 startActivity(intent)
             } catch (e: Exception) {
-                AnalyticsManager.logError("ad_click", "Failed to open URL: $adUrl")
+                AnalyticsManager.logError(
+                    getString(R.string.ad_click_error), 
+                    getString(R.string.error_open_url, adUrl)
+                )
             }
         }
         
         // Log ad impression
-        AnalyticsManager.logAdImpression(adItem.bannerId ?: "unknown", placement)
+        AnalyticsManager.logAdImpression(adItem.bannerId ?: getString(R.string.unknown_title), placement)
     }
     
     private fun displayArticleContent() {

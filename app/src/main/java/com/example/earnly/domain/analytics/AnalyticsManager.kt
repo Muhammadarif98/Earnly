@@ -1,12 +1,26 @@
 package com.example.earnly.domain.analytics
 
+import android.content.Context
 import android.util.Log
 import com.example.earnly.EarnlyApplication
+import com.example.earnly.R
 import com.yandex.metrica.YandexMetrica
 
 object AnalyticsManager {
     
     private const val TAG = "AnalyticsManager"
+    private lateinit var appContext: Context
+    
+    fun init(context: Context) {
+        appContext = context.applicationContext
+    }
+    
+    private fun getString(resId: Int): String {
+        if (!::appContext.isInitialized) {
+            return "" // Возвращаем пустую строку, если контекст не инициализирован
+        }
+        return appContext.getString(resId)
+    }
     
     fun logEvent(eventName: String, params: Map<String, String> = emptyMap()) {
         try {
@@ -23,107 +37,111 @@ object AnalyticsManager {
     }
     
     fun logScreenView(screenName: String) {
-        logEvent("screen_view", mapOf("screen_name" to screenName))
+        logEvent(getString(R.string.event_screen_view), mapOf(
+            getString(R.string.param_screen_name) to screenName
+        ))
     }
     
     fun logArticleView(articleId: String, articleTitle: String) {
-        logEvent("article_view", mapOf(
-            "article_id" to articleId,
-            "article_title" to articleTitle
+        logEvent(getString(R.string.event_article_view), mapOf(
+            getString(R.string.param_article_id) to articleId,
+            getString(R.string.param_article_title) to articleTitle
         ))
     }
     
     fun logAdClick(adId: String, placement: String) {
-        logEvent("ad_click", mapOf(
-            "app_key" to EarnlyApplication.APP_KEY,
-            "ad_id" to adId,
-            "placement" to placement
+        logEvent(getString(R.string.event_ad_click), mapOf(
+            getString(R.string.param_app_key) to EarnlyApplication.APP_KEY,
+            getString(R.string.param_ad_id) to adId,
+            getString(R.string.param_placement) to placement
         ))
     }
     
     fun logTabSwitch(tab: String) {
-        logEvent("tab_switch", mapOf("tab" to tab))
+        logEvent(getString(R.string.event_tab_switch), mapOf(
+            getString(R.string.param_tab) to tab
+        ))
     }
     
     fun logError(source: String, message: String) {
-        logEvent("app_error", mapOf(
-            "source" to source,
-            "error_message" to message
+        logEvent(getString(R.string.event_app_error), mapOf(
+            getString(R.string.param_source) to source,
+            getString(R.string.param_error_message) to message
         ))
     }
     
     // Логирование начала загрузки контента
     fun logContentLoadStart(tab: String) {
-        logEvent("content_load_start", mapOf(
-            "tab" to tab,
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_content_load_start), mapOf(
+            getString(R.string.param_tab) to tab,
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
     
     // Логирование успешной загрузки контента
     fun logContentLoadSuccess(tab: String, itemCount: Int, timeMs: Long) {
-        logEvent("content_load_success", mapOf(
-            "tab" to tab,
-            "item_count" to itemCount.toString(),
-            "load_time_ms" to timeMs.toString(),
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_content_load_success), mapOf(
+            getString(R.string.param_tab) to tab,
+            getString(R.string.param_item_count) to itemCount.toString(),
+            getString(R.string.param_load_time_ms) to timeMs.toString(),
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
     
     // Логирование загрузки рекламы
     fun logAdLoadStart(placement: String) {
-        logEvent("ad_load_start", mapOf(
-            "app_key" to EarnlyApplication.APP_KEY,
-            "placement" to placement,
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_ad_load_start), mapOf(
+            getString(R.string.param_app_key) to EarnlyApplication.APP_KEY,
+            getString(R.string.param_placement) to placement,
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
     
     // Логирование успешной загрузки рекламы
     fun logAdLoadSuccess(adId: String, placement: String, timeMs: Long) {
-        logEvent("ad_load_success", mapOf(
-            "app_key" to EarnlyApplication.APP_KEY,
-            "ad_id" to adId,
-            "placement" to placement,
-            "load_time_ms" to timeMs.toString(),
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_ad_load_success), mapOf(
+            getString(R.string.param_app_key) to EarnlyApplication.APP_KEY,
+            getString(R.string.param_ad_id) to adId,
+            getString(R.string.param_placement) to placement,
+            getString(R.string.param_load_time_ms) to timeMs.toString(),
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
     
     // Логирование отображения рекламы
     fun logAdImpression(adId: String, placement: String) {
-        logEvent("ad_impression", mapOf(
-            "app_key" to EarnlyApplication.APP_KEY,
-            "ad_id" to adId,
-            "placement" to placement,
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_ad_impression), mapOf(
+            getString(R.string.param_app_key) to EarnlyApplication.APP_KEY,
+            getString(R.string.param_ad_id) to adId,
+            getString(R.string.param_placement) to placement,
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
     
     // Логирование времени просмотра статьи
     fun logArticleViewDuration(articleId: String, durationSec: Int) {
-        logEvent("article_view_duration", mapOf(
-            "article_id" to articleId,
-            "duration_sec" to durationSec.toString(),
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_article_view_duration), mapOf(
+            getString(R.string.param_article_id) to articleId,
+            getString(R.string.param_duration_sec) to durationSec.toString(),
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
     
     // Логирование прокрутки контента
     fun logScrollDepth(screenName: String, depth: Int) {
-        logEvent("scroll_depth", mapOf(
-            "screen_name" to screenName,
-            "depth_percent" to depth.toString(),
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_scroll_depth), mapOf(
+            getString(R.string.param_screen_name) to screenName,
+            getString(R.string.param_depth_percent) to depth.toString(),
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
     
     // Логирование закрытия статьи
     fun logArticleClose(articleId: String, timeSpentSec: Int) {
-        logEvent("article_close", mapOf(
-            "article_id" to articleId,
-            "time_spent_sec" to timeSpentSec.toString(),
-            "timestamp" to System.currentTimeMillis().toString()
+        logEvent(getString(R.string.event_article_close), mapOf(
+            getString(R.string.param_article_id) to articleId,
+            getString(R.string.param_time_spent_sec) to timeSpentSec.toString(),
+            getString(R.string.param_timestamp) to System.currentTimeMillis().toString()
         ))
     }
 } 

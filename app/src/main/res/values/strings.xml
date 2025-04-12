@@ -3,33 +3,106 @@
     <string name="app_name">Earnly</string>
     
     <!-- Onboarding -->
-    <string name="onboarding_title_1">Узнайте о способах заработка</string>
-    <string name="onboarding_desc_1">Получите доступ к проверенным способам заработка в интернете</string>
-    <string name="onboarding_title_2">Выбирайте подходящие варианты</string>
-    <string name="onboarding_desc_2">Найдите способы заработка, которые подходят именно вам</string>
-    <string name="onboarding_title_3">Начните зарабатывать</string>
-    <string name="onboarding_desc_3">Применяйте полученные знания и увеличивайте свой доход</string>
+    <string name="onboarding_title_1">Открывайте новый контент</string>
+    <string name="onboarding_desc_1">Исследуйте различные статьи и обновления, подобранные по вашим интересам</string>
+    <string name="onboarding_title_2">Будьте в курсе</string>
+    <string name="onboarding_desc_2">Получайте уведомления в реальном времени и не пропускайте важные обновления</string>
+    <string name="onboarding_title_3">Зарабатывайте баллы</string>
+    <string name="onboarding_desc_3">Собирайте баллы по мере взаимодействия с контентом и открывайте эксклюзивные награды</string>
     <string name="onboarding_skip">Пропустить</string>
     <string name="onboarding_next">Далее</string>
     <string name="onboarding_start">Начать</string>
+    <string name="onboarding_screen_name">onboarding</string>
+    <string name="pref_onboarding_completed">onboarding_completed</string>
     
     <!-- Main Screen -->
     <string name="tab_money_ways">Одни способы заработка</string>
     <string name="tab_other_ways">Другие способы заработка</string>
-    <string name="error_loading_content">Error loading content</string>
-    <string name="try_again">Try Again</string>
+    <string name="error_loading_content">Ошибка загрузки контента</string>
+    <string name="try_again">Повторить</string>
     <string name="ad_label">Реклама</string>
+    <string name="no_content_available">Нет доступного контента</string>
     
     <!-- Article Screen -->
-    <string name="article_details">Article Details</string>
-    <string name="read_more">Read More</string>
+    <string name="article_details">Детали статьи</string>
+    <string name="read_more">Читать далее</string>
+    <string name="article_detail_screen">article_detail</string>
+    <string name="unknown_title">Неизвестно</string>
+    <string name="learn_more">УЗНАТЬ БОЛЬШЕ 💰</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="money_tab">money</string>
+    <string name="article_top_placement">article_top</string>
+    <string name="article_bottom_placement">article_bottom</string>
+    <string name="error_loading_ads">Не удалось загрузить рекламу: %1$s</string>
+    <string name="error_open_url">Не удалось открыть URL: %1$s</string>
 
     <!-- Error Screen -->
     <string name="error_no_internet">Ошибка получения данных с сервера. Проверьте интернет-соединение и повторите попытку.</string>
-    <string name="retry">ПОВТОРИТЬ ПОПЫТКУ</string>
+    <string name="retry">Повторить</string>
 
     <!-- Ad buttons -->
     <string name="ad_details_button">ПОДРОБНЕЕ 💰</string>
     <string name="ad_learn_more">УЗНАТЬ БОЛЬШЕ 💰</string>
     <string name="ad_learn_button">УЗНАТЬ 💰</string>
+    
+    <!-- Analytics -->
+    <string name="main_screen">main_screen</string>
+    <string name="inline_placement">inline</string>
+    <string name="banner_placement">banner</string>
+    <string name="item_ad_placement">item_ad</string>
+    <string name="main_ad_click_error">main_ad_click</string>
+    <string name="ad_click_error">ad_click</string>
+    <string name="main_content_loading_error">main_content_loading</string>
+    <string name="article_detail_ads_error">article_detail_ads</string>
+    
+    <!-- Analytics Event Names -->
+    <string name="event_screen_view">screen_view</string>
+    <string name="event_article_view">article_view</string>
+    <string name="event_ad_click">ad_click</string>
+    <string name="event_tab_switch">tab_switch</string>
+    <string name="event_error">error</string>
+    <string name="event_app_error">app_error</string>
+    <string name="event_content_load_start">content_load_start</string>
+    <string name="event_content_load_success">content_load_success</string>
+    <string name="event_ad_load_start">ad_load_start</string>
+    <string name="event_ad_load_success">ad_load_success</string>
+    <string name="event_ad_impression">ad_impression</string>
+    <string name="event_article_view_duration">article_view_duration</string>
+    <string name="event_scroll_depth">scroll_depth</string>
+    <string name="event_article_close">article_close</string>
+    <string name="event_onboarding_skip">onboarding_skip</string>
+    <string name="event_onboarding_next">onboarding_next</string>
+    <string name="event_onboarding_complete">onboarding_complete</string>
+    <string name="event_onboarding_page_viewed">onboarding_page_viewed</string>
+    
+    <!-- Analytics Param Names -->
+    <string name="param_screen_name">screen_name</string>
+    <string name="param_article_id">article_id</string>
+    <string name="param_article_title">article_title</string>
+    <string name="param_app_key">app_key</string>
+    <string name="param_ad_id">ad_id</string>
+    <string name="param_placement">placement</string>
+    <string name="param_tab_name">tab_name</string>
+    <string name="param_tab">tab</string>
+    <string name="param_source">source</string>
+    <string name="param_message">message</string>
+    <string name="param_error_message">error_message</string>
+    <string name="param_duration">duration</string>
+    <string name="param_duration_sec">duration_sec</string>
+    <string name="param_depth">depth</string>
+    <string name="param_depth_percent">depth_percent</string>
+    <string name="param_position">position</string>
+    <string name="param_timestamp">timestamp</string>
+    <string name="param_item_count">item_count</string>
+    <string name="param_load_time_ms">load_time_ms</string>
+    <string name="param_time_spent_sec">time_spent_sec</string>
+    
+    <!-- Content Types -->
+    <string name="article_type">article</string>
+    <string name="banner_type">banner</string>
+    <string name="inline_ad_type">inline_ad</string>
+    <string name="item_ad_type">item_ad</string>
+    
+    <!-- Extras -->
+    <string name="extra_content_item">extra_content_item</string>
 </resources>

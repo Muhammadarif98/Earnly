@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var errorLayout: View
     private lateinit var btnRetry: Button
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var tabLayout: TabLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         
         // Log screen view
-        AnalyticsManager.logScreenView("main_screen")
+        AnalyticsManager.logScreenView(getString(R.string.main_screen))
         
         // Initialize views
         recyclerView = findViewById(R.id.recyclerView)
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         errorLayout = findViewById(R.id.errorLayout)
         btnRetry = findViewById(R.id.btnRetry)
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+        tabLayout = findViewById(R.id.tabLayout)
         
         // Setup RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -85,13 +87,12 @@ class MainActivity : AppCompatActivity() {
                 
                 if (totalItemCount > 0) {
                     val scrollPercentage = (lastVisibleItem.toFloat() / totalItemCount.toFloat() * 100).toInt()
-                    AnalyticsManager.logScrollDepth("main_screen", scrollPercentage)
+                    AnalyticsManager.logScrollDepth(getString(R.string.main_screen), scrollPercentage)
                 }
             }
         })
         
         // Setup tabs
-        val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
         
         // Add tabs
         tabLayout.addTab(tabLayout.newTab().setText(R.string.tab_money_ways))
@@ -205,54 +206,59 @@ class MainActivity : AppCompatActivity() {
         recyclerView.visibility = View.VISIBLE
     }
     
-    private fun showError(message: String) {
+    private fun showError(message: String = getString(R.string.error_no_internet)) {
         android.util.Log.d(TAG, "Показываем экран ошибки: $message")
-        progressBar.visibility = View.GONE
-        recyclerView.visibility = View.GONE
         
-        // Используем встроенный errorLayout из activity_main.xml
-        val tvErrorMessage = errorLayout.findViewById<TextView>(R.id.tvErrorMessage)
-        if (tvErrorMessage != null) {
-            tvErrorMessage.text = message
-        } else {
-            // Если TextView с id tvErrorMessage не найден, значит используем стандартный errorLayout
-            // Здесь можно добавить дополнительную логику при необходимости
+        recyclerView.visibility = View.GONE
+        progressBar.visibility = View.GONE
+        errorLayout.visibility = View.VISIBLE
+        
+        try {
+            val errorMessageTextView = errorLayout.findViewById<TextView>(R.id.tvErrorMessage)
+            errorMessageTextView.text = message
+        } catch (e: Exception) {
             android.util.Log.w(TAG, "TextView tvErrorMessage не найден в errorLayout")
         }
         
-        errorLayout.visibility = View.VISIBLE
+        btnRetry.setOnClickListener {
+            viewModel.loadContent(tabs[tabLayout.selectedTabPosition])
+        }
         
-        // Логируем ошибку
-        AnalyticsManager.logError("main_content_loading", message)
+        // Log error
+        AnalyticsManager.logError(getString(R.string.main_content_loading_error), message)
     }
     
     private fun onContentItemClicked(item: ContentItem) {
         when (item.contentType) {
-            "article" -> {
+            getString(R.string.article_type) -> {
                 // Track article click
-                AnalyticsManager.logArticleView(item.articleId ?: "unknown", item.title ?: "Unknown title")
+                AnalyticsManager.logArticleView(
+                    item.articleId ?: getString(R.string.unknown_title), 
+                    item.title ?: getString(R.string.unknown_title)
+                )
                 
                 // Open article detail
                 val intent = Intent(this, ArticleDetailActivity::class.java)
                 intent.putExtra(ArticleDetailActivity.EXTRA_CONTENT_ITEM, item)
                 startActivity(intent)
             }
-            "banner", "inline_ad", "item_ad" -> {
+            getString(R.string.banner_type), getString(R.string.inline_ad_type), getString(R.string.item_ad_type) -> {
                 // Track ad click
-                AnalyticsManager.logAdClick(item.bannerId ?: "unknown", 
+                AnalyticsManager.logAdClick(
+                    item.bannerId ?: getString(R.string.unknown_title), 
                     when (item.contentType) {
-                        "inline_ad" -> "inline"
-                        "banner" -> "banner"
-                        else -> "item_ad"
+                        getString(R.string.inline_ad_type) -> getString(R.string.inline_placement)
+                        getString(R.string.banner_type) -> getString(R.string.banner_placement)
+                        else -> getString(R.string.item_ad_placement)
                     }
                 )
                 
                 // Open ad link
                 val adUrl = "https://dohodinfor.ru/?app_key=${EarnlyApplication.APP_KEY}&ad_id=${item.bannerId}&placement=${
                     when (item.contentType) {
-                        "inline_ad" -> "inline"
-                        "banner" -> "banner"
-                        else -> "item_ad"
+                        getString(R.string.inline_ad_type) -> getString(R.string.inline_placement)
+                        getString(R.string.banner_type) -> getString(R.string.banner_placement)
+                        else -> getString(R.string.item_ad_placement)
                     }
                 }"
                 
@@ -260,7 +266,10 @@ class MainActivity : AppCompatActivity() {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(adUrl))
                     startActivity(intent)
                 } catch (e: Exception) {
-                    AnalyticsManager.logError("main_ad_click", "Failed to open URL: $adUrl")
+                    AnalyticsManager.logError(
+                        getString(R.string.main_ad_click_error), 
+                        getString(R.string.error_open_url, adUrl)
+                    )
                 }
             }
         }

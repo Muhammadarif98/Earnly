@@ -2,134 +2,129 @@ package com.example.earnly.presentation.onboarding
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.earnly.data.preferences.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.earnly.R
-import com.example.earnly.data.preferences.PreferenceManager
 import com.example.earnly.domain.analytics.AnalyticsManager
 import com.example.earnly.presentation.main.MainActivity
+import com.example.earnly.presentation.onboarding.OnboardingAdapter
+import com.example.earnly.presentation.onboarding.OnboardingItem
+import com.google.android.material.button.MaterialButton
 
 class OnboardingActivity : AppCompatActivity() {
 
-    private lateinit var onboardingAdapter: OnboardingAdapter
-    private lateinit var indicatorsContainer: LinearLayout
+    private lateinit var viewPager: ViewPager2
+    private lateinit var skipButton: MaterialButton
+    private lateinit var nextButton: MaterialButton
+    private lateinit var getStartedButton: MaterialButton
+    private lateinit var indicatorsContainer: ViewGroup
     private lateinit var preferenceManager: PreferenceManager
+    
+    private val onboardingItems = listOf(
+        OnboardingItem(
+            imageResId = R.drawable.onboarding_1,
+            title = getString(R.string.onboarding_title_1),
+            description = getString(R.string.onboarding_desc_1)
+        ),
+        OnboardingItem(
+            imageResId = R.drawable.onboarding_2,
+            title = getString(R.string.onboarding_title_2),
+            description = getString(R.string.onboarding_desc_2)
+        ),
+        OnboardingItem(
+            imageResId = R.drawable.onboarding_3,
+            title = getString(R.string.onboarding_title_3),
+            description = getString(R.string.onboarding_desc_3)
+        )
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
-
+        
+        // Инициализация PreferenceManager
         preferenceManager = PreferenceManager(this)
         
-        // Log screen view
-        AnalyticsManager.logScreenView("onboarding")
-
-        // Set the onboarding items
-        val onboardingItems = listOf(
-            OnboardingItem(
-                R.drawable.onboarding_1,
-                getString(R.string.onboarding_title_1),
-                getString(R.string.onboarding_desc_1)
-            ),
-            OnboardingItem(
-                R.drawable.onboarding_2,
-                getString(R.string.onboarding_title_2),
-                getString(R.string.onboarding_desc_2)
-            ),
-            OnboardingItem(
-                R.drawable.onboarding_3,
-                getString(R.string.onboarding_title_3),
-                getString(R.string.onboarding_desc_3)
-            )
-        )
-
-        val viewPager = findViewById<ViewPager2>(R.id.viewPagerOnboarding)
+        // Логирование просмотра экрана онбординга
+        AnalyticsManager.logScreenView(getString(R.string.onboarding_screen_name))
+        
+        viewPager = findViewById(R.id.viewPagerOnboarding)
+        skipButton = findViewById(R.id.btnSkip)
+        nextButton = findViewById(R.id.btnNext)
+        
+        // Создадим кнопку для последней страницы
+        getStartedButton = MaterialButton(this).apply {
+            text = getString(R.string.onboarding_start)
+            visibility = View.GONE
+            id = View.generateViewId()
+        }
+        
         indicatorsContainer = findViewById(R.id.layoutIndicators)
         
-        // Set up the adapter
-        onboardingAdapter = OnboardingAdapter(onboardingItems)
-        viewPager.adapter = onboardingAdapter
+        // Настройка ViewPager с адаптером
+        viewPager.adapter = OnboardingAdapter(onboardingItems)
         
-        // Set up indicators
-        setupIndicators()
-        setCurrentIndicator(0)
+        skipButton.setOnClickListener {
+            AnalyticsManager.logEvent(
+                getString(R.string.event_onboarding_skip), 
+                mapOf(getString(R.string.param_position) to viewPager.currentItem.toString())
+            )
+            finishOnboarding()
+        }
         
-        // Set up page change callback
+        nextButton.setOnClickListener {
+            val currentPosition = viewPager.currentItem
+            AnalyticsManager.logEvent(
+                getString(R.string.event_onboarding_next), 
+                mapOf(getString(R.string.param_position) to currentPosition.toString())
+            )
+            
+            if (currentPosition < onboardingItems.size - 1) {
+                viewPager.currentItem = currentPosition + 1
+            }
+        }
+        
+        getStartedButton.setOnClickListener {
+            AnalyticsManager.logEvent(getString(R.string.event_onboarding_complete), emptyMap())
+            finishOnboarding()
+        }
+        
+        // Слушатель для отслеживания смены страницы
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                setCurrentIndicator(position)
                 
-                // Update Next button text if last page
-                val btnNext = findViewById<android.widget.Button>(R.id.btnNext)
-                btnNext.text = if (position == onboardingItems.size - 1) {
-                    getString(R.string.onboarding_start)
-                } else {
-                    getString(R.string.onboarding_next)
-                }
+                // Логирование перехода между страницами онбординга
+                AnalyticsManager.logEvent(
+                    getString(R.string.event_onboarding_page_viewed),
+                    mapOf(getString(R.string.param_position) to position.toString())
+                )
+                
+                // Обновление видимости кнопок в зависимости от позиции
+                updateButtonsVisibility(position)
             }
         })
-        
-        // Set up click listeners
-        findViewById<android.widget.Button>(R.id.btnNext).setOnClickListener {
-            if (viewPager.currentItem == onboardingItems.size - 1) {
-                // If on the last page, proceed to the main app
-                finishOnboarding()
-            } else {
-                // Move to the next page
-                viewPager.currentItem = viewPager.currentItem + 1
-            }
-        }
-        
-        findViewById<android.widget.Button>(R.id.btnSkip).setOnClickListener {
-            finishOnboarding()
-        }
     }
     
-    private fun setupIndicators() {
-        val indicators = arrayOfNulls<ImageView>(onboardingAdapter.itemCount)
-        val layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(8, 0, 8, 0)
+    private fun updateButtonsVisibility(position: Int) {
+        val isLastPage = position == onboardingItems.size - 1
         
-        for (i in indicators.indices) {
-            indicators[i] = ImageView(applicationContext)
-            indicators[i]?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    applicationContext,
-                    R.drawable.indicator_inactive
-                )
-            )
-            indicators[i]?.layoutParams = layoutParams
-            indicatorsContainer.addView(indicators[i])
-        }
-    }
-    
-    private fun setCurrentIndicator(position: Int) {
-        val childCount = indicatorsContainer.childCount
-        for (i in 0 until childCount) {
-            val imageView = indicatorsContainer.getChildAt(i) as ImageView
-            imageView.setImageDrawable(
-                ContextCompat.getDrawable(
-                    applicationContext,
-                    if (i == position) {
-                        R.drawable.indicator_active
-                    } else {
-                        R.drawable.indicator_inactive
-                    }
-                )
-            )
-        }
+        skipButton.visibility = if (isLastPage) View.GONE else View.VISIBLE
+        nextButton.visibility = if (isLastPage) View.GONE else View.VISIBLE
+        getStartedButton.visibility = if (isLastPage) View.VISIBLE else View.GONE
     }
     
     private fun finishOnboarding() {
+        // Сохраняем информацию, что онбординг пройден
         preferenceManager.setFirstLaunchCompleted()
-        startActivity(Intent(this, MainActivity::class.java))
+        
+        // Переходим в главный экран
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
         finish()
     }
 } 
